@@ -1,0 +1,8 @@
+pandas
+numpy
+yfinance
+plotly
+streamlit
+gymnasium
+shimmy
+stable-baselines3

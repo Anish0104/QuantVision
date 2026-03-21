@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 8, 12, 10;
+  --background-end-rgb: 2, 4, 3;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      145deg,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    );
+  overflow-x: hidden;
+}
+
+.grain-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+}
+
+.metric-pod {
+  @apply bg-[#111111]/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 transition-all duration-500 hover:scale-[1.03] hover:border-finvo-accent/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)];
+}
+
+.pill-button {
+  @apply rounded-full px-10 py-4 bg-finvo-accent text-finvo-dark font-black tracking-tighter shadow-[0_4px_20px_rgba(0,255,204,0.4)] transition-all duration-300 hover:bg-white hover:scale-105 active:scale-95;
+}
+
+.glass-sidebar {
+  @apply bg-[#050505]/60 backdrop-blur-2xl border-r border-white/5;
+}
