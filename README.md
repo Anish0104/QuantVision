@@ -69,7 +69,7 @@ graph TD
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Sujataalegavi7/TradingStrategyOptimization
+   git clone https://github.com/Anish0104/QuantVision
    cd TradingStrategyOptimization
    ```
 
