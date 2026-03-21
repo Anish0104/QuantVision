@@ -187,7 +187,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    document.title = data ? `${ticker} | FinVision Pro` : "FinVision Pro | Institutional Strategy";
+    document.title = data ? `${ticker} | QuantVision Pro` : "QuantVision Pro | Institutional Strategy";
   }, [data, ticker]);
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
@@ -518,7 +518,7 @@ export default function Home() {
           </motion.div>
           
           <h1 className="text-[80px] font-black font-outfit tracking-tighter leading-none mb-4 text-white hover:italic transition-all cursor-default lg:text-[96px]">
-            FinVision
+            QuantVision
           </h1>
           <p className="text-[#6366f1]/80 font-black uppercase tracking-[1em] text-[10px] mb-16 ml-2">Institutional Quant Terminal</p>
           
@@ -569,7 +569,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-2xl bg-[#6366f1] flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.3)]">
               <Zap size={22} className="text-white" />
             </div>
-            <h1 className="text-2xl font-black font-outfit tracking-tighter text-white">FinVision</h1>
+            <h1 className="text-2xl font-black font-outfit tracking-tighter text-white">QuantVision</h1>
           </motion.div>
         </div>
 
