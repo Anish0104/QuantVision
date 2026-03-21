@@ -1,6 +1,6 @@
-# QuantVision | AI-Driven Trading Strategy Studio 📈
+# QV | AI-Driven Trading Strategy Studio 📈
 
-QuantVision is an institutional-grade trading strategy optimization platform. It leverages Reinforcement Learning (Proximal Policy Optimization) to discover profitable trading signals on historical market data, compared against traditional financial benchmarks.
+QV is an institutional-grade trading strategy optimization platform. It leverages Reinforcement Learning (Proximal Policy Optimization) to discover profitable trading signals on historical market data, compared against traditional financial benchmarks.
 
 ## 🛠️ Tech Stack
 
@@ -93,7 +93,7 @@ streamlit run app.py
 ```
 
 ## 📊 Evaluation Metrics
-QuantVision evaluates strategies using:
+QV evaluates strategies using:
 - **Sharpe Ratio**: Risk-adjusted returns.
 - **Sortino Ratio**: Returns adjusted for downside volatility.
 - **Max Drawdown**: Portfolio "underwater" risk.

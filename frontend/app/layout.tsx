@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "QuantVision | Institutional Quant Studio",
+  title: "QV | Institutional Quant Studio",
   description: "Advanced Reinforcement Learning for Quantitative Trading",
 };
 
