@@ -2,6 +2,28 @@
 
 QuantVision is an institutional-grade trading strategy optimization platform. It leverages Reinforcement Learning (Proximal Policy Optimization) to discover profitable trading signals on historical market data, compared against traditional financial benchmarks.
 
+## 🛠️ Tech Stack
+
+### Frontend (The Dashboard)
+- **Next.js 14+**: Application Framework (App Router)
+- **TypeScript**: Precision state management
+- **Tailwind CSS**: Modern Glassmorphic styling
+- **Framer Motion**: High-fidelity cinematic animations
+- **Recharts**: Institutional-grade data visualization
+- **Lucide React**: Vector-perfect icon system
+
+### Backend (The Brain)
+- **FastAPI**: Ultra-fast asynchronous REST API
+- **Python 3.10+**: Core logic and data processing
+- **Uvicorn**: High-performance production server
+
+### AI & Quant Engineering
+- **Stable-Baselines3**: Proximal Policy Optimization (PPO) RL Agents
+- **Gymnasium**: Custom environment for trading simulations
+- **yFinance**: Real-time Global Market Data Engine
+- **Pandas & NumPy**: High-speed numerical analysis
+- **Modern Portfolio Theory (MPT)**: Mathematical optimization for Sharpe Ratios
+
 ## 🏗️ System Architecture
 
 ```mermaid
