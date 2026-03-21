@@ -187,7 +187,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    document.title = data ? `${ticker} | QuantVision Pro` : "QuantVision Pro | Institutional Strategy";
+    document.title = data ? `${ticker} | QuantVision` : "QuantVision | Institutional Strategy";
   }, [data, ticker]);
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
