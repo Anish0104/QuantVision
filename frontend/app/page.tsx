@@ -290,7 +290,7 @@ export default function Home() {
                     </div>
                     <div className="w-full lg:w-1/2 space-y-8 lg:pl-12">
                        <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-                          Your portfolio is currently optimized for **Institutional Resilience**. 
+                          Your portfolio is currently optimized for <span className="text-white font-bold">Institutional Resilience</span>. 
                           The secular AI engine has clustered assets into a risk-parity framework.
                        </p>
                        <button className="w-full md:w-auto rounded-full px-8 py-4 bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-[#6366f1] hover:text-white transition-all">
@@ -312,7 +312,7 @@ export default function Home() {
                </h4>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
                   <div>
-                    <p className="text-gray-400 text-lg mb-8">How would your strategy handle a **"Black Swan"** event? We've simulated historic crashes against your current neural weights.</p>
+                    <p className="text-gray-400 text-lg mb-8">How would your strategy handle a <span className="text-white font-bold">"Black Swan"</span> event? We've simulated historic crashes against your current neural weights.</p>
                     <div className="space-y-6">
                        {[
                          { name: "2008 Financial Crisis", impact: "-12.4%", status: "SURVIVED" },
@@ -334,7 +334,7 @@ export default function Home() {
                          <ShieldCheck className="mx-auto mb-6 text-[#6366f1]/30" size={64} />
                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-8">Crisis Shield: READY</p>
                          <button 
-                           onClick={() => triggerToast("Simulation Node: RE-CALCULATING...")}
+                           onClick={() => triggerToast("Simulation Sync: RE-CALCULATING...")}
                            className="flex items-center gap-3 mx-auto px-6 py-3 bg-[#6366f1] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white hover:text-[#6366f1] transition-all"
                          >
                            <RefreshCw size={14} className="animate-spin-slow" />
@@ -365,7 +365,7 @@ export default function Home() {
                        />
                      ))}
                   </div>
-                  <p className="mt-8 text-gray-400 text-sm">Fear & Greed Index: **74 (Extreme Greed)**. Analyst core suggests caution on entry points.</p>
+                  <p className="mt-8 text-gray-400 text-sm">Fear & Greed Index: <span className="text-white font-bold">74 (Extreme Greed)</span>. Analyst core suggests caution on entry points.</p>
                </div>
                <div className="bg-[#111] p-12 rounded-[40px] border border-white/5">
                   <h4 className="font-black text-[11px] text-gray-500 uppercase tracking-[0.4em] mb-8">Global Liquidity</h4>
@@ -552,16 +552,16 @@ export default function Home() {
               onClick={handleEnterTerminal}
               className="group relative px-8 py-4 md:px-12 md:py-5 bg-white text-[#020202] rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_60px_rgba(99,102,241,0.2)]"
             >
-              <span className="relative z-10">Access Node</span>
+              <span className="relative z-10">Access Dashboard</span>
               <div className="absolute inset-0 bg-[#6366f1] opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute inset-0 bg-white group-hover:bg-[#6366f1] transition-colors" />
-              <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-white transition-opacity">Access Node</span>
+              <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-white transition-opacity">Access Dashboard</span>
             </button>
           </div>
 
           <div className="mt-20 md:mt-40 grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 border-t border-white/5 pt-12 md:pt-20">
             {[
-              { l: "SECURE NODE", v: "ACTIVE" },
+              { l: "SECURE SYNC", v: "ACTIVE" },
               { l: "QUANT CORE", v: "V8.0" },
               { l: "MARKET CLOUD", v: "SYNCED" }
             ].map((i, idx) => (
@@ -816,7 +816,7 @@ export default function Home() {
           >
             <div className="flex items-center gap-4 mb-6">
                <span className="h-[1px] w-8 md:w-12 bg-[#6366f1]/40" />
-               <p className="text-[#6366f1] font-black tracking-[0.4em] text-[8px] md:text-[9px] uppercase">Institutional Node v8.1</p>
+               <p className="text-[#6366f1] font-black tracking-[0.4em] text-[8px] md:text-[9px] uppercase">Institutional Hub v8.1</p>
             </div>
             <h2 className="text-[32px] md:text-[52px] font-black font-outfit leading-[0.9] mb-6 tracking-tighter max-w-4xl">
                {data ? `Analysis: ${data.ticker}` : `Welcome, Institutional Agent`} <br /> <span className="text-gray-600 italic">Proprietary</span> {data ? "Optimization" : "Terminal Hub"}.
