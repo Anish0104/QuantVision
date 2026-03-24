@@ -29,6 +29,7 @@ import {
   BarChart,
   Bar
 } from "recharts";
+import { Menu, X } from "lucide-react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -92,6 +93,7 @@ export default function Home() {
   const [riskTolerance, setRiskTolerance] = useState("Moderate");
   const [profileOpen, setProfileOpen] = useState(false);
   const [entranceStep, setEntranceStep] = useState(0); // 0: Landing, 1: Dashboard
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [marketPrices, setMarketPrices] = useState([
     { label: "S&P 500", val: 5241.53, change: 1.2 },
     { label: "VIX INDEX", val: 13.42, change: -4.5 },
@@ -166,11 +168,14 @@ export default function Home() {
         start_date: "2021-01-01",
         end_date: "2024-03-21"
       });
+      // The backend returns { ticker, signal, metrics: { ... }, equity_curve: [ ... ] }
+      // We need to ensure we map metrics correctly if they are used directly in the UI
       setData(res.data);
       triggerToast(`Analysis Synchronized: ${targetTicker}`);
       if (activeTab !== "Alpha Signals") {
         setActiveTab("Alpha Signals");
       }
+      setIsMobileMenuOpen(false);
     } catch (e) {
       console.error(e);
     } finally {
@@ -221,23 +226,23 @@ export default function Home() {
       case "Portfolio Hub":
         return (
           <div className="space-y-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
                <MetricCard 
                  label="Strategy Yield" 
-                 value={data.total_return ? `${(data.total_return * 100).toFixed(2)}%` : "84,201.00"} 
-                 trend={data.total_return > 0 ? 2.4 : -1.2} 
+                 value={data.metrics?.["Total Return (%)"] !== undefined ? `${data.metrics["Total Return (%)"].toFixed(2)}%` : "N/A"} 
+                 trend={data.metrics?.["Total Return (%)"] > 0 ? 2.4 : -1.2} 
                  subtext="Cumulative Return" 
                />
                <MetricCard 
                  label="Efficiency Index" 
-                 value={data.sharpe_ratio ? data.sharpe_ratio.toFixed(2) : "1.42"} 
-                 trend={data.sharpe_ratio > 1 ? 4.1 : -0.5} 
+                 value={data.metrics?.["Sharpe Ratio"] !== undefined ? data.metrics["Sharpe Ratio"].toFixed(2) : "N/A"} 
+                 trend={data.metrics?.["Sharpe Ratio"] > 1 ? 4.1 : -0.5} 
                  subtext="Sharpe Ratio" 
                />
                <MetricCard 
                  label="Risk Exposure" 
-                 value={data.max_drawdown ? `${(data.max_drawdown * 100).toFixed(1)}%` : "12.4%"} 
-                 trend={data.max_drawdown < 0.1 ? -4.1 : 2.0} 
+                 value={data.metrics?.["Max Drawdown (%)"] !== undefined ? `${data.metrics["Max Drawdown (%)"].toFixed(1)}%` : "N/A"} 
+                 trend={data.metrics?.["Max Drawdown (%)"] > -10 ? -4.1 : 2.0} 
                  subtext="Max Drawdown" 
                />
             </div>
@@ -246,14 +251,30 @@ export default function Home() {
                   <h4 className="font-black text-[11px] text-gray-500 uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
                     <PieChart size={16} /> Asset Allocation Matrix
                   </h4>
-                  <div className="flex items-center justify-between">
-                    <div className="w-1/2 h-[400px]">
+                  <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+                    <div className="w-full lg:w-1/2 h-[300px] md:h-[400px]">
                       <ResponsiveContainer>
-                        <PieChart>
-                          {/* Recharts Pie logic here if needed, or just a beautiful placeholder */}
-                        </PieChart>
+                        <RePieChart>
+                          <Pie 
+                            data={[
+                              { name: 'Equities', value: 65 },
+                              { name: 'Bonds', value: 20 },
+                              { name: 'Alpha', value: 15 }
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={100}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            <Cell fill="#6366f1" />
+                            <Cell fill="#1a1a1a" />
+                            <Cell fill="#333" />
+                          </Pie>
+                        </RePieChart>
                       </ResponsiveContainer>
-                      <div className="flex items-center justify-center gap-12 pt-20">
+                      <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 pt-10">
                          {[
                            { label: "Equities", color: "#6366f1", val: "65%" },
                            { label: "Bonds", color: "#222", val: "20%" },
@@ -262,17 +283,17 @@ export default function Home() {
                            <div key={item.label} className="text-center">
                               <div className="w-3 h-3 rounded-full mx-auto mb-3" style={{ background: item.color }} />
                               <p className="text-[10px] font-black uppercase text-gray-500 mb-1">{item.label}</p>
-                              <p className="text-2xl font-black text-white">{item.val}</p>
+                              <p className="text-xl md:text-2xl font-black text-white">{item.val}</p>
                            </div>
                          ))}
                       </div>
                     </div>
-                    <div className="w-1/2 space-y-8 pl-12">
-                       <p className="text-gray-400 text-base leading-relaxed">
+                    <div className="w-full lg:w-1/2 space-y-8 lg:pl-12">
+                       <p className="text-gray-400 text-sm md:text-base leading-relaxed">
                           Your portfolio is currently optimized for **Institutional Resilience**. 
                           The secular AI engine has clustered assets into a risk-parity framework.
                        </p>
-                       <button className="rounded-full px-8 py-4 bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-[#6366f1] hover:text-white transition-all">
+                       <button className="w-full md:w-auto rounded-full px-8 py-4 bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-[#6366f1] hover:text-white transition-all">
                           Run Rebalance Logic
                        </button>
                     </div>
@@ -517,19 +538,19 @@ export default function Home() {
             <Zap size={40} className="text-white" />
           </motion.div>
           
-          <h1 className="text-[80px] font-black font-outfit tracking-tighter leading-none mb-4 text-white hover:italic transition-all cursor-default lg:text-[96px]">
+          <h1 className="text-[48px] md:text-[80px] font-black font-outfit tracking-tighter leading-none mb-4 text-white hover:italic transition-all cursor-default lg:text-[96px]">
             QuantVision
           </h1>
-          <p className="text-[#6366f1]/80 font-black uppercase tracking-[1em] text-[10px] mb-16 ml-2">Institutional Quant Terminal</p>
+          <p className="text-[#6366f1]/80 font-black uppercase tracking-[0.5em] md:tracking-[1em] text-[8px] md:text-[10px] mb-12 md:ml-2">Institutional Quant Terminal</p>
           
           <div className="max-w-xl mx-auto space-y-8">
-            <p className="text-gray-500 text-lg font-medium leading-relaxed italic">
+            <p className="text-gray-500 text-sm md:text-lg font-medium leading-relaxed italic">
               "Precision is the only edge in asymmetric markets."
             </p>
             
             <button 
               onClick={handleEnterTerminal}
-              className="group relative px-12 py-5 bg-white text-[#020202] rounded-full font-black text-[10px] uppercase tracking-[0.4em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_60px_rgba(99,102,241,0.2)]"
+              className="group relative px-8 py-4 md:px-12 md:py-5 bg-white text-[#020202] rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_60px_rgba(99,102,241,0.2)]"
             >
               <span className="relative z-10">Access Node</span>
               <div className="absolute inset-0 bg-[#6366f1] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -538,15 +559,15 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="mt-40 grid grid-cols-3 gap-12 border-t border-white/5 pt-20">
+          <div className="mt-20 md:mt-40 grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 border-t border-white/5 pt-12 md:pt-20">
             {[
               { l: "SECURE NODE", v: "ACTIVE" },
               { l: "QUANT CORE", v: "V8.0" },
               { l: "MARKET CLOUD", v: "SYNCED" }
-            ].map(i => (
-              <div key={i.l}>
-                <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-2">{i.l}</p>
-                <p className="text-lg font-black text-white">{i.v}</p>
+            ].map((i, idx) => (
+              <div key={i.l} className={idx === 2 ? "col-span-2 md:col-span-1" : ""}>
+                <p className="text-[8px] md:text-[9px] text-gray-500 font-black uppercase tracking-widest mb-2">{i.l}</p>
+                <p className="text-base md:text-lg font-black text-white">{i.v}</p>
               </div>
             ))}
           </div>
@@ -558,8 +579,37 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-[#020202] text-white font-inter selection:bg-[#6366f1] selection:text-white overflow-hidden relative">
       
+      {/* Mobile Header */}
+      <div className="fixed top-0 left-0 w-full h-20 bg-black/80 backdrop-blur-md border-b border-white/5 z-[60] flex items-center justify-between px-6 lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-[#6366f1] flex items-center justify-center">
+            <Zap size={18} className="text-white" />
+          </div>
+          <h1 className="text-xl font-black font-outfit tracking-tighter text-white">QuantVision</h1>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white"
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
+
+      {/* Sidebar Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
-      <aside className="w-72 bg-[#080808] border-r border-white/5 flex flex-col pt-12 z-20 shadow-2xl">
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-[#080808] border-r border-white/5 flex flex-col pt-12 z-[55] shadow-2xl transition-transform duration-500 ease-in-out lg:relative lg:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="px-8 mb-12">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -590,7 +640,10 @@ export default function Home() {
                 icon={item.icon} 
                 label={item.id} 
                 active={activeTab === item.id} 
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsMobileMenuOpen(false);
+                }}
               />
             </motion.div>
           ))}
@@ -601,7 +654,10 @@ export default function Home() {
                 {watchlist.map((symbol) => (
                   <button 
                     key={symbol}
-                    onClick={() => runAnalysis(symbol)}
+                    onClick={() => {
+                      runAnalysis(symbol);
+                      setIsMobileMenuOpen(false);
+                    }}
                     className="px-4 py-2 rounded-xl bg-[#6366f1]/10 border border-[#6366f1]/30 text-[9px] font-black text-white hover:bg-[#6366f1]/20 transition-all font-outfit"
                   >
                     {symbol}
@@ -618,7 +674,10 @@ export default function Home() {
             {trendingAssets.map((asset) => (
               <button 
                 key={asset.symbol}
-                onClick={() => runAnalysis(asset.symbol)}
+                onClick={() => {
+                  runAnalysis(asset.symbol);
+                  setIsMobileMenuOpen(false);
+                }}
                 className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-[9px] font-black text-gray-400 hover:border-[#6366f1] hover:text-white hover:bg-[#6366f1]/10 transition-all font-outfit"
               >
                 {asset.symbol}
@@ -747,8 +806,8 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: `linear-gradient(#6366f1 1px, transparent 1px), linear-gradient(90deg, #6366f1 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
         
         {/* Header Hero */}
-        <header className="px-10 pt-16 pb-12 relative border-b border-white/5">
-          <div className="absolute top-0 right-0 w-[800px] h-[600px] bg-[#6366f1]/5 blur-[200px] -z-10 rounded-full animate-pulse" />
+        <header className="px-6 md:px-10 pt-32 md:pt-16 pb-12 relative border-b border-white/5">
+          <div className="absolute top-0 right-0 w-full lg:w-[800px] h-[600px] bg-[#6366f1]/5 blur-[200px] -z-10 rounded-full animate-pulse" />
           
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -756,18 +815,18 @@ export default function Home() {
             className="z-10 relative"
           >
             <div className="flex items-center gap-4 mb-6">
-               <span className="h-[1px] w-12 bg-[#6366f1]/40" />
-               <p className="text-[#6366f1] font-black tracking-[0.4em] text-[9px] uppercase">Institutional Node v8.1</p>
+               <span className="h-[1px] w-8 md:w-12 bg-[#6366f1]/40" />
+               <p className="text-[#6366f1] font-black tracking-[0.4em] text-[8px] md:text-[9px] uppercase">Institutional Node v8.1</p>
             </div>
-            <h2 className="text-[52px] font-black font-outfit leading-[0.9] mb-6 tracking-tighter max-w-4xl">
+            <h2 className="text-[32px] md:text-[52px] font-black font-outfit leading-[0.9] mb-6 tracking-tighter max-w-4xl">
                {data ? `Analysis: ${data.ticker}` : `Welcome, Institutional Agent`} <br /> <span className="text-gray-600 italic">Proprietary</span> {data ? "Optimization" : "Terminal Hub"}.
             </h2>
-            <p className="text-gray-500 max-w-xl text-base leading-relaxed font-medium mb-10">
+            <p className="text-gray-500 max-w-xl text-sm md:text-base leading-relaxed font-medium mb-10">
                Access high-fidelity optimization parameters for global equity markets. Precision-engineered for risk-adjusted performance.
             </p>
 
             {/* Quick Metrics Glance */}
-            <div className="flex gap-8 items-center border-l-2 border-white/5 pl-12 flex-wrap">
+            <div className="flex gap-6 md:gap-8 items-center border-l-2 border-white/5 pl-6 md:pl-12 flex-wrap">
               {marketPrices.map((m, i) => (
                 <div key={i} className="group cursor-default">
                   <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1 group-hover:text-[#6366f1] transition-colors">{m.label}</p>
@@ -784,7 +843,7 @@ export default function Home() {
         </header>
 
         {/* Dashboard Content */}
-        <section className="px-12 pb-40" id="analysis-section">
+        <section className="px-6 md:px-12 pb-40" id="analysis-section">
            {renderContent()}
         </section>
       </main>
