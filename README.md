@@ -1,6 +1,7 @@
 # QuantVision | AI-Driven Trading Strategy Studio 📈
 
-QuantVision is an institutional-grade trading strategy optimization platform. It leverages Reinforcement Learning (Proximal Policy Optimization) to discover profitable trading signals on historical market data, compared against traditional financial benchmarks.
+QuantVision is an institutional-grade trading strategy optimization platform. It leverages Reinforcement Learning (Proximal Policy Optimization) to discover profitable trading signals on historical market data, compared against traditional financial benchmarks
+
 
 ## 🛠️ Tech Stack
 
