@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
+
 from typing import Dict
 
 class RiskManager:
@@ -25,7 +25,10 @@ class RiskManager:
         mu = np.mean(returns)
         sigma = np.std(returns)
         
-        return norm.ppf(1 - confidence_level, mu, sigma)
+        # Use hardcoded z-score for 95% confidence interval instead of scipy.stats.norm
+        # norm.ppf(0.05) is approx -1.64485
+        z_score = -1.64485
+        return mu + z_score * sigma
         
     @staticmethod
     def calculate_cvar(returns: pd.Series, confidence_level: float = 0.95) -> float:

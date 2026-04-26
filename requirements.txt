@@ -1,8 +1,5 @@
 pandas
 numpy
 yfinance
-plotly
-streamlit
 fastapi
 uvicorn
-scipy
