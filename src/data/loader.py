@@ -6,10 +6,10 @@ from typing import List, Optional
 class DataLoader:
     """Professional data loader for fetching and caching stock market data."""
     
-    def __init__(self, cache_dir: str = "data/cache"):
+    def __init__(self, cache_dir: str = "/tmp/cache"):
         self.cache_dir = cache_dir
         if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir)
+            os.makedirs(cache_dir, exist_ok=True)
             
     def fetch_data(self, tickers: List[str], start: str, end: str) -> pd.DataFrame:
         """Fetch data from Yahoo Finance and return a combined DataFrame."""
