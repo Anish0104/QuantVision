@@ -3,6 +3,6 @@ numpy
 yfinance
 plotly
 streamlit
-gymnasium
-shimmy
-stable-baselines3
+fastapi
+uvicorn
+scipy

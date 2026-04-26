@@ -82,7 +82,7 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
 // --- MAIN PAGE ---
 
 export default function Home() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "" : "http://localhost:8000");
   const [activeTab, setActiveTab] = useState("Alpha Signals");
   const [ticker, setTicker] = useState("AAPL");
   const [data, setData] = useState<any>(null);
@@ -203,21 +203,134 @@ export default function Home() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  const formatMarketValue = (value: number) => {
+    if (value >= 1000) {
+      return new Intl.NumberFormat("en-US", {
+        maximumFractionDigits: value >= 10000 ? 0 : 2,
+      }).format(value);
+    }
+
+    return value.toFixed(2);
+  };
+
+  const quickLaunchAssets = trendingAssets.slice(0, 5);
+
 
   const renderContent = () => {
     if (!data) {
       return (
-        <div className="h-[60vh] flex items-center justify-center border-2 border-dashed border-white/10 rounded-[64px] bg-gradient-to-br from-white/[0.03] to-transparent">
-          <motion.div 
-            animate={{ y: [0, -15, 0] }}
-            transition={{ repeat: Infinity, duration: 5 }}
-            className="text-center"
+        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="quant-panel relative overflow-hidden rounded-[40px] p-8 md:p-10"
           >
-            <div className="w-28 h-28 rounded-[38px] bg-white/[0.03] flex items-center justify-center mx-auto mb-10 border border-white/10 shadow-2xl">
-              <Search className="text-gray-700" size={48} />
+            <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,rgba(201,139,91,0.16),transparent_70%)]" />
+            <div className="relative z-10">
+              <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-[rgba(201,139,91,0.24)] bg-[rgba(201,139,91,0.1)] px-4 py-2 text-[10px] font-black uppercase tracking-[0.32em] text-[#f2c9a5]">
+                <span className="h-2 w-2 rounded-full bg-[#7dd3c7]" />
+                Quant Research Workspace
+              </div>
+
+              <div className="max-w-2xl space-y-5">
+                <h2 className="font-outfit text-4xl font-black leading-none text-[#f4ecdf] md:text-6xl">
+                  Turn a ticker into a live signal deck.
+                </h2>
+                <p className="max-w-xl text-sm leading-7 text-[#b7b0a6] md:text-base">
+                  Search from the sidebar or jump in with a liquid name below. We will pull market history,
+                  engineer indicators, and generate the first pass of your quant readout.
+                </p>
+              </div>
+
+              <div className="mt-10 flex flex-wrap gap-3">
+                {quickLaunchAssets.map((asset) => (
+                  <button
+                    key={asset.symbol}
+                    onClick={() => runAnalysis(asset.symbol)}
+                    className="group rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:border-[#c98b5b]/40 hover:bg-[rgba(201,139,91,0.08)]"
+                  >
+                    <p className="text-[9px] font-black uppercase tracking-[0.28em] text-[#8a847b]">{asset.type}</p>
+                    <p className="mt-1 font-outfit text-lg font-bold text-[#f4ecdf]">{asset.symbol}</p>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-12 grid gap-4 md:grid-cols-3">
+                {[
+                  { label: "Live Market Feed", value: "Yahoo Finance", detail: "Daily price history on demand" },
+                  { label: "Quant Stack", value: "RL + TA", detail: "Signal engine + engineered indicators" },
+                  { label: "Best Start", value: "AAPL / NVDA", detail: "Liquid names with dense history" },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-[28px] border border-white/[0.08] bg-black/20 p-5">
+                    <p className="text-[9px] font-black uppercase tracking-[0.28em] text-[#8a847b]">{item.label}</p>
+                    <p className="mt-3 font-outfit text-2xl font-bold text-[#f4ecdf]">{item.value}</p>
+                    <p className="mt-2 text-sm leading-6 text-[#9d968d]">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className="text-gray-600 text-[11px] font-black uppercase tracking-[0.5em]">Analyst core ready for synchronization</p>
           </motion.div>
+
+          <div className="grid gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08 }}
+              className="quant-panel rounded-[36px] p-7"
+            >
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8a847b]">Global Pulse</p>
+                  <p className="mt-2 font-outfit text-2xl font-bold text-[#f4ecdf]">Market snapshot</p>
+                </div>
+                <div className="rounded-full border border-[rgba(125,211,199,0.18)] bg-[rgba(125,211,199,0.08)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[#7dd3c7]">
+                  Live
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {marketPrices.map((market) => (
+                  <div key={market.label} className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#8a847b]">{market.label}</p>
+                      <p className="mt-1 font-outfit text-xl font-bold text-[#f4ecdf]">{formatMarketValue(market.val)}</p>
+                    </div>
+                    <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] ${
+                      market.change >= 0
+                        ? "bg-[rgba(125,211,199,0.12)] text-[#7dd3c7]"
+                        : "bg-[rgba(232,113,113,0.12)] text-[#f28b82]"
+                    }`}>
+                      {market.change >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                      {Math.abs(market.change).toFixed(1)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.16 }}
+              className="quant-panel rounded-[36px] p-7"
+            >
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8a847b]">How To Start</p>
+              <div className="mt-6 space-y-4">
+                {[
+                  "Search a ticker in the sidebar or tap a quick-launch name.",
+                  "Run analysis to generate the equity curve and core metrics.",
+                  "Switch tabs to compare allocation, stress, and market context.",
+                ].map((step, index) => (
+                  <div key={step} className="flex gap-4 rounded-2xl border border-white/[0.08] bg-black/20 p-4">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[rgba(201,139,91,0.12)] font-outfit text-sm font-bold text-[#f2c9a5]">
+                      0{index + 1}
+                    </div>
+                    <p className="text-sm leading-6 text-[#b7b0a6]">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       );
     }
@@ -520,56 +633,154 @@ export default function Home() {
 
   if (entranceStep === 0) {
     return (
-      <div className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6 relative overflow-hidden font-inter selection:bg-[#6366f1] selection:text-white">
-        {/* Elite Neural Background */}
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.25),transparent)] pointer-events-none" />
-        <div className="absolute top-0 left-0 w-full h-full opacity-[0.07] pointer-events-none" style={{ backgroundImage: `linear-gradient(#6366f1 1px, transparent 1px), linear-gradient(90deg, #6366f1 1px, transparent 1px)`, backgroundSize: '120px 120px' }} />
-        
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="w-full max-w-4xl relative z-10 text-center"
+      <div className="quant-shell min-h-screen overflow-hidden px-6 py-8 text-white font-inter selection:bg-[#c98b5b] selection:text-[#081018]">
+        <div className="quant-grid pointer-events-none absolute inset-0 opacity-40" />
+        <div className="pointer-events-none absolute left-[-12%] top-[8%] h-[24rem] w-[24rem] rounded-full bg-[rgba(125,211,199,0.08)] blur-[110px]" />
+        <div className="pointer-events-none absolute right-[-8%] top-[12%] h-[30rem] w-[30rem] rounded-full bg-[rgba(201,139,91,0.12)] blur-[130px]" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-10 mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center gap-8 lg:grid-cols-[1.08fr_0.92fr]"
         >
-          <motion.div 
-            animate={{ y: [0, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-            className="w-20 h-20 rounded-[32px] bg-gradient-to-br from-[#6366f1] to-[#4f46e5] flex items-center justify-center mx-auto mb-12 shadow-[0_0_80px_rgba(99,102,241,0.4)]"
-          >
-            <Zap size={40} className="text-white" />
-          </motion.div>
-          
-          <h1 className="text-[48px] md:text-[80px] font-black font-outfit tracking-tighter leading-none mb-4 text-white hover:italic transition-all cursor-default lg:text-[96px]">
-            QuantVision
-          </h1>
-          <p className="text-[#6366f1]/80 font-black uppercase tracking-[0.5em] md:tracking-[1em] text-[8px] md:text-[10px] mb-12 md:ml-2">Institutional Quant Terminal</p>
-          
-          <div className="max-w-xl mx-auto space-y-8">
-            <p className="text-gray-500 text-sm md:text-lg font-medium leading-relaxed italic">
-              "Precision is the only edge in asymmetric markets."
-            </p>
-            
-            <button 
-              onClick={handleEnterTerminal}
-              className="group relative px-8 py-4 md:px-12 md:py-5 bg-white text-[#020202] rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-[0.4em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_60px_rgba(99,102,241,0.2)]"
-            >
-              <span className="relative z-10">Access Dashboard</span>
-              <div className="absolute inset-0 bg-[#6366f1] opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute inset-0 bg-white group-hover:bg-[#6366f1] transition-colors" />
-              <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-white transition-opacity">Access Dashboard</span>
-            </button>
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-3 rounded-full border border-[rgba(201,139,91,0.24)] bg-[rgba(201,139,91,0.08)] px-4 py-2 text-[10px] font-black uppercase tracking-[0.34em] text-[#f2c9a5]">
+              <span className="h-2 w-2 rounded-full bg-[#7dd3c7]" />
+              Adaptive Allocation Studio
+            </div>
+
+            <div className="space-y-6">
+              <h1 className="max-w-4xl font-outfit text-5xl font-black leading-[0.92] text-[#f4ecdf] md:text-7xl lg:text-[6.5rem]">
+                Build a cleaner trading story before the market opens.
+              </h1>
+              <p className="max-w-2xl text-base leading-8 text-[#b9b1a5] md:text-lg">
+                QuantVision combines signal generation, risk framing, and portfolio context into one elegant desk.
+                Start with a liquid ticker, then move from alpha to allocation in a few clicks.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <button
+                onClick={handleEnterTerminal}
+                className="rounded-full bg-[#f1e6d5] px-8 py-4 text-[10px] font-black uppercase tracking-[0.34em] text-[#081018] transition-all hover:-translate-y-0.5 hover:bg-[#c98b5b] hover:text-[#f8f3ea]"
+              >
+                Enter Terminal
+              </button>
+              <div className="flex flex-wrap gap-3">
+                {quickLaunchAssets.slice(0, 3).map((asset) => (
+                  <button
+                    key={asset.symbol}
+                    onClick={() => {
+                      setTicker(asset.symbol);
+                      handleEnterTerminal();
+                    }}
+                    className="rounded-full border border-white/10 bg-white/[0.03] px-5 py-4 text-left transition-all hover:border-[#7dd3c7]/30 hover:bg-[rgba(125,211,199,0.08)]"
+                  >
+                    <span className="block text-[9px] font-black uppercase tracking-[0.28em] text-[#8a847b]">{asset.type}</span>
+                    <span className="mt-1 block font-outfit text-base font-bold text-[#f4ecdf]">{asset.symbol}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4 pt-4 sm:grid-cols-3">
+              {[
+                { label: "Signal Engine", value: "RL + Technical Factors" },
+                { label: "Portfolio Lens", value: "Optimization + Correlation" },
+                { label: "Stress Desk", value: "Historic Crisis Replay" },
+              ].map((item) => (
+                <div key={item.label} className="quant-panel rounded-[28px] p-5">
+                  <p className="text-[9px] font-black uppercase tracking-[0.28em] text-[#8a847b]">{item.label}</p>
+                  <p className="mt-3 font-outfit text-xl font-bold text-[#f4ecdf]">{item.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-20 md:mt-40 grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 border-t border-white/5 pt-12 md:pt-20">
-            {[
-              { l: "SECURE SYNC", v: "ACTIVE" },
-              { l: "QUANT CORE", v: "V8.0" },
-              { l: "MARKET CLOUD", v: "SYNCED" }
-            ].map((i, idx) => (
-              <div key={i.l} className={idx === 2 ? "col-span-2 md:col-span-1" : ""}>
-                <p className="text-[8px] md:text-[9px] text-gray-500 font-black uppercase tracking-widest mb-2">{i.l}</p>
-                <p className="text-base md:text-lg font-black text-white">{i.v}</p>
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.08 }}
+              className="quant-panel relative overflow-hidden rounded-[40px] p-7 md:p-8"
+            >
+              <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top,rgba(125,211,199,0.18),transparent_72%)]" />
+              <div className="relative z-10">
+                <div className="mb-8 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8a847b]">Global Pulse</p>
+                    <p className="mt-2 font-outfit text-3xl font-bold text-[#f4ecdf]">Live market ribbon</p>
+                  </div>
+                  <div className="rounded-full border border-[rgba(125,211,199,0.18)] bg-[rgba(125,211,199,0.08)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[#7dd3c7]">
+                    Synced
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {marketPrices.map((market) => (
+                    <div key={market.label} className="rounded-[28px] border border-white/[0.08] bg-white/[0.03] p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#8a847b]">{market.label}</p>
+                          <p className="mt-2 font-outfit text-2xl font-bold text-[#f4ecdf]">{formatMarketValue(market.val)}</p>
+                        </div>
+                        <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] ${
+                          market.change >= 0
+                            ? "bg-[rgba(125,211,199,0.12)] text-[#7dd3c7]"
+                            : "bg-[rgba(232,113,113,0.12)] text-[#f28b82]"
+                        }`}>
+                          {market.change >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                          {Math.abs(market.change).toFixed(1)}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.14 }}
+              className="quant-panel rounded-[40px] p-7 md:p-8"
+            >
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(201,139,91,0.14)] text-[#f2c9a5]">
+                  <TrendingUp size={22} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8a847b]">Preview Architecture</p>
+                  <p className="mt-1 font-outfit text-2xl font-bold text-[#f4ecdf]">What opens next</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 items-end gap-2 rounded-[28px] border border-white/[0.08] bg-black/20 p-5">
+                {[28, 46, 34, 60, 52, 74, 66, 88, 76, 94, 86, 100].map((height, index) => (
+                  <motion.div
+                    key={height}
+                    initial={{ height: 0, opacity: 0.4 }}
+                    animate={{ height: `${height}%`, opacity: 1 }}
+                    transition={{ delay: index * 0.03 + 0.18, duration: 0.5 }}
+                    className={`rounded-t-[14px] ${
+                      index > 8 ? "bg-[#c98b5b]" : index > 4 ? "bg-[#d7b18d]" : "bg-[#7dd3c7]"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-6 space-y-3">
+                {[
+                  "Alpha Signals surfaces the trade bias and equity path.",
+                  "Portfolio Hub reframes the same universe as an allocation problem.",
+                  "Stress Terminal checks how the basket behaves across known shocks.",
+                ].map((line) => (
+                  <div key={line} className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm leading-6 text-[#b9b1a5]">
+                    {line}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>
@@ -577,7 +788,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#020202] text-white font-inter selection:bg-[#6366f1] selection:text-white overflow-hidden relative">
+    <div className="quant-shell flex min-h-screen overflow-hidden relative text-white font-inter selection:bg-[#c98b5b] selection:text-[#081018]">
       
       {/* Mobile Header */}
       <div className="fixed top-0 left-0 w-full h-20 bg-black/80 backdrop-blur-md border-b border-white/5 z-[60] flex items-center justify-between px-6 lg:hidden">

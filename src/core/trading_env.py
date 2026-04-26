@@ -1,11 +1,9 @@
-import gymnasium as gym
-from gymnasium import spaces
 import numpy as np
 import pandas as pd
 from typing import Dict, Any, Optional
 
-class TradingEnv(gym.Env):
-    """Professional Trading Environment for Reinforcement Learning."""
+class TradingEnv:
+    """Professional Trading Environment for Reinforcement Learning (Gym-compatible interface)."""
     metadata = {"render_modes": ["human"]}
 
     def __init__(
@@ -15,27 +13,16 @@ class TradingEnv(gym.Env):
         commission: float = 0.001,  # 0.1% transaction fee
         slippage: float = 0.0005,   # 0.05% slippage on entry/exit
     ):
-        super(TradingEnv, self).__init__()
         
         self.df = df.reset_index(drop=True)
         self.initial_balance = initial_balance
         self.commission = commission
         self.slippage = slippage
         
-        # Action space: 0 = Hold, 1 = Buy (100% Cash -> Asset), 2 = Sell (100% Asset -> Cash)
-        # Note: In a real portfolio project, Continuous actions (allocation %) are better.
-        # But let's stay with discrete for now to be compatible with SB3 PPO.
-        self.action_space = spaces.Discrete(3)
-        
-        # Observation space: 
-        # Indicators from df + [current_balance, current_shares, entry_price]
         self.n_features = len(df.columns)
-        self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(self.n_features + 3,), dtype=np.float32
-        )
 
     def reset(self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None):
-        super().reset(seed=seed)
+
         
         self.current_step = 0
         self.balance = self.initial_balance

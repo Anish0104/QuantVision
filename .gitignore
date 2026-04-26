@@ -20,6 +20,7 @@ __pycache__/
 !package.json
 !tsconfig.json
 !next.config.js
+!vercel.json
 
 # Env
 .env
